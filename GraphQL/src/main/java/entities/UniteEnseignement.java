@@ -1,8 +1,5 @@
 package entities;
 
-import java.util.Objects;
-
-
 public class UniteEnseignement {
     private int code;
     private String domaine;
@@ -21,50 +18,24 @@ public class UniteEnseignement {
         this.semestre = semestre;
     }
 
-    public int getCode() {
-        return code;
-    }
+    public int getCode() { return code; }
+    public void setCode(int code) { this.code = code; }
 
-    public void setCode(int code) {
-        this.code = code;
-    }
+    public String getDomaine() { return domaine; }
+    public void setDomaine(String domaine) { this.domaine = domaine; }
 
-    public String getDomaine() {
-        return domaine;
-    }
+    public String getResponsable() { return responsable; }
+    public void setResponsable(String responsable) { this.responsable = responsable; }
 
-    public void setDomaine(String domaine) {
-        this.domaine = domaine;
-    }
+    public int getCredits() { return credits; }
+    public void setCredits(int credits) { this.credits = credits; }
 
-    public String getResponsable() {
-        return responsable;
-    }
-
-    public void setResponsable(String responsable) {
-        this.responsable = responsable;
-    }
-
-    public int getCredits() {
-        return credits;
-    }
-
-    public void setCredits(int credits) {
-        this.credits = credits;
-    }
-
-    public int getSemestre() {
-        return semestre;
-    }
-
-    public void setSemestre(int semestre) {
-        this.semestre = semestre;
-    }
-
-
+    public int getSemestre() { return semestre; }
+    public void setSemestre(int semestre) { this.semestre = semestre; }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getCode(), getDomaine(), getResponsable(), getCredits(), getSemestre());
+    public String toString() {
+        return "UniteEnseignement{code=" + code + ", domaine=" + domaine + ", responsable=" + responsable
+                + ", credits=" + credits + ", semestre=" + semestre + "}";
     }
 }

@@ -1,57 +1,46 @@
 package graphql;
 
-// Import the business logic class responsible for managing "UniteEnseignement" data
-import business.UniteEnseignementBusiness;
-
-// Import the GraphQL library class used to define the root of GraphQL mutations
-import com.coxautodev.graphql.tools.GraphQLRootResolver;
-
-// Import the entity class representing a Teaching Unit (Unité d’Enseignement)
+import com.coxautodev.graphql.tools.GraphQLMutationResolver;
+import entities.Module;
 import entities.UniteEnseignement;
 
-/**
- * This class defines all GraphQL mutations related to the "UniteEnseignement" entity.
- * A mutation in GraphQL is used to perform write operations (create, update, delete)
- * as opposed to queries, which are for read operations.
- */
-public class MutationResolver implements GraphQLRootResolver {
+public class MutationResolver implements GraphQLMutationResolver {
 
-    // Attribute used to access the business logic (service layer)
-    public UniteEnseignementBusiness helper;
-
-    /**
-     * Constructor of the resolver.
-     * It initializes the business helper that manages the teaching units.
-     */
-    public MutationResolver() {
-        helper = new UniteEnseignementBusiness();
+    // ===== Modules =====
+    public boolean addModule(String matricule, String libelle, int coef,
+                             int volumeHoraire, int codeUE, Module.TypeModule type) {
+        UniteEnseignement ue = Services.UE.getUEByCode(codeUE);
+        if (ue == null) {
+            return false; // l unite d enseignement doit exister
+        }
+        return Services.MODULE.addModule(new Module(matricule, libelle, coef, volumeHoraire, type, ue));
     }
 
-    /**
-     * GraphQL Mutation: addUniteEnseignement
-     *
-     * This method allows clients to add a new "Unité d’Enseignement" to the system.
-     *
-     * When a GraphQL mutation like the following is executed:
-     *
-     * mutation {
-     *     addUniteEnseignement(
-     *         code: 101,
-     *         domaine: "Informatique",
-     *         responsable: "Dr. Smith",
-     *         credits: 4,
-     *         semestre: 2
-     *     )
-     * }
-     *
-     * GraphQL calls this Java method to create and save a new teaching unit.
-     */
-    public boolean addUniteEnseignement(int code, String domaine, String responsable, int credits, int semestre) {
-        // Create a new UniteEnseignement object with the provided parameters
-        UniteEnseignement ue = new UniteEnseignement(code, domaine, responsable, credits, semestre);
+    public Module updateModule(String matricule, String libelle, int coef,
+                               int volumeHoraire, Module.TypeModule type, int codeUE) {
+        UniteEnseignement ue = Services.UE.getUEByCode(codeUE);
+        if (ue == null) {
+            return null;
+        }
+        return Services.MODULE.updateModule(new Module(matricule, libelle, coef, volumeHoraire, type, ue));
+    }
 
-        // Call the business logic method to add the new unit
-        // The helper handles the actual persistence or logic of adding the entity
-        return helper.addUniteEnseignement(ue);
+    public String deleteModule(String matricule) {
+        return Services.MODULE.deleteModule(matricule) ? "deleted successfully" : "module not found";
+    }
+
+    // ===== Unites d enseignement =====
+    public boolean addUniteEnseignement(int code, String domaine, String responsable,
+                                        int credits, int semestre) {
+        return Services.UE.addUE(new UniteEnseignement(code, domaine, responsable, credits, semestre));
+    }
+
+    public UniteEnseignement updateUniteEnseignement(int code, String domaine, String responsable,
+                                                     int credits, int semestre) {
+        return Services.UE.updateUE(new UniteEnseignement(code, domaine, responsable, credits, semestre));
+    }
+
+    public String deleteUniteEnseignement(int code) {
+        return Services.UE.deleteUE(code) ? "deleted successfully" : "UE not found";
     }
 }

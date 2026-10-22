@@ -1,4 +1,3 @@
-import com.coxautodev.graphql.tools.GraphQLResolver;
 import com.coxautodev.graphql.tools.SchemaParser;
 import graphql.MutationResolver;
 import graphql.QueryResolver;
@@ -16,11 +15,9 @@ public class GraphQLEndPoint extends SimpleGraphQLServlet {
 
     private static GraphQLSchema buildSchema() {
         return SchemaParser.newParser()
-               .file("schema.graphql")
-               .resolvers(new QueryResolver(), new MutationResolver())
-               .build()
-               .makeExecutableSchema();
-
+                .file("schema.graphql")
+                .resolvers(new QueryResolver(), new MutationResolver())
+                .build()
+                .makeExecutableSchema();
     }
-
 }

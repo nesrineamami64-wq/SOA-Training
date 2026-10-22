@@ -1,56 +1,36 @@
 package graphql;
 
-// Import the business logic class responsible for managing "UniteEnseignement" data
-import business.UniteEnseignementBusiness;
-
-// Import the GraphQL library class used to define the root of GraphQL queries
-import com.coxautodev.graphql.tools.GraphQLRootResolver;
-
-// Import the entity class that represents a Teaching Unit (Unité d’Enseignement)
+import com.coxautodev.graphql.tools.GraphQLQueryResolver;
+import entities.Module;
 import entities.UniteEnseignement;
 
 import java.util.List;
 
-/**
- * This class acts as the root resolver for GraphQL queries.
- * It tells GraphQL how to fetch data when a query is executed.
- *
- * In this example, it handles queries related to "UniteEnseignement".
- */
-public class QueryResolver implements GraphQLRootResolver {
+public class QueryResolver implements GraphQLQueryResolver {
 
-    // Attribute used to call the business logic layer (service) for data operations
-    public UniteEnseignementBusiness helper;
-
-    /**
-     * Constructor of the resolver.
-     * It initializes the business helper that provides methods to retrieve UE data.
-     */
-    public QueryResolver(){
-        helper = new UniteEnseignementBusiness();
+    // ===== Modules =====
+    public List<Module> modules() {
+        return Services.MODULE.getAllModules();
     }
 
-    /**
-     * GraphQL Query: allUEs
-     *
-     * This method will be automatically exposed to the GraphQL schema as a query named "allUEs".
-     *
-     * When a client sends the GraphQL query:
-     *
-     *    query {
-     *        allUEs {
-     *            code
-     *            domaine
-     *        }
-     *    }
-     *
-     * GraphQL will call this method to return a list of "UniteEnseignement" objects.
-     *
-     * @return List of all Teaching Units (Unité d’Enseignement)
-     */
-    public List<UniteEnseignement> allUEs(){
-        // Delegates the request to the business layer method getListeUE()
-        // which fetches all UE entities (e.g., from a database or a static list)
-        return helper.getListeUE();
+    public List<Module> modulesByType(Module.TypeModule type) {
+        return Services.MODULE.getModulesByType(type);
+    }
+
+    public Module moduleByMatricule(String matricule) {
+        return Services.MODULE.getModuleByMatricule(matricule);
+    }
+
+    // ===== Unites d enseignement =====
+    public UniteEnseignement uniteEnseignement(int code) {
+        return Services.UE.getUEByCode(code);
+    }
+
+    public List<UniteEnseignement> uniteEnseignementsByDomaine(String domaine) {
+        return Services.UE.getUEByDomaine(domaine);
+    }
+
+    public List<UniteEnseignement> uniteEnseignementsBySemestre(int semestre) {
+        return Services.UE.getUEBySemestre(semestre);
     }
 }

@@ -2,94 +2,57 @@ package business;
 
 import entities.Module;
 import entities.UniteEnseignement;
-import business.UniteEnseignementBusiness;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ModuleBusiness {
-    private static List<Module> modules;
-private UniteEnseignementBusiness uniteEnseignementBusiness=new UniteEnseignementBusiness();
-    public ModuleBusiness() {
-        modules = new ArrayList<Module>();
-        // Initialisation avec quelques données de test
-        modules.add(new Module("M101", "Algorithmique", 3, 30, Module.TypeModule.PROFESSIONNEL,uniteEnseignementBusiness.getUEByCode(1)));
-        modules.add(new Module("M102", "Base de données", 2, 20, Module.TypeModule.PROFESSIONNEL,uniteEnseignementBusiness.getUEByCode(1)));
-        modules.add(new Module("M201", "Communication", 1, 15, Module.TypeModule.TRANSVERSAL,uniteEnseignementBusiness.getUEByCode(2)));
+
+    private final List<Module> modules = new ArrayList<>();
+
+    public ModuleBusiness(UniteEnseignementBusiness ueBusiness) {
+        // Donnees initiales pour pouvoir tester tout de suite
+        UniteEnseignement ue1 = ueBusiness.getUEByCode(1);
+        UniteEnseignement ue2 = ueBusiness.getUEByCode(2);
+        modules.add(new Module("M101", "Algorithmique", 3, 42, Module.TypeModule.PROFESSIONNEL, ue1));
+        modules.add(new Module("M102", "Anglais", 2, 21, Module.TypeModule.TRANSVERSAL, ue2));
+        modules.add(new Module("M103", "Methodologie de recherche", 1, 21, Module.TypeModule.RECHERCHE, ue1));
     }
 
-    // Ajouter un module
-    public boolean addModule(Module module) {
-
-        int code=module.getUniteEnseignement().getCode();
-       UniteEnseignement ue=uniteEnseignementBusiness.getUEByCode(code);
-       if(ue!=null){
-           module.setUniteEnseignement(ue);
-           return modules.add(module);
+    public synchronized List<Module> getAllModules() {
+        return new ArrayList<>(modules);
     }
-        return false;
-}
 
-    // Récupérer un module par son matricule
-    public Module getModuleByMatricule(String matricule) {
-        for (Module m : modules) {
-            if (m.getMatricule().equals(matricule)) {
-                return m;
-            }
+    public synchronized List<Module> getModulesByType(Module.TypeModule type) {
+        return modules.stream().filter(m -> m.getType() == type).collect(Collectors.toList());
+    }
+
+    public synchronized Module getModuleByMatricule(String matricule) {
+        return modules.stream().filter(m -> m.getMatricule().equals(matricule)).findFirst().orElse(null);
+    }
+
+    public synchronized boolean addModule(Module module) {
+        if (getModuleByMatricule(module.getMatricule()) != null) {
+            return false; // matricule deja utilise
         }
-        return null;
+        return modules.add(module);
     }
 
-    // Récupérer les modules par type
-    public List<Module> getModulesByType(Module.TypeModule type) {
-        List<Module> result = new ArrayList<>();
-        for (Module m : modules) {
-            if (m.getType() == type) {
-                result.add(m);
-            }
+    public synchronized Module updateModule(Module nouveau) {
+        Module existant = getModuleByMatricule(nouveau.getMatricule());
+        if (existant == null) {
+            return null;
         }
-        return result;
+        existant.setNom(nouveau.getNom());
+        existant.setCoefficient(nouveau.getCoefficient());
+        existant.setVolumeHoraire(nouveau.getVolumeHoraire());
+        existant.setType(nouveau.getType());
+        existant.setUniteEnseignement(nouveau.getUniteEnseignement());
+        return existant;
     }
 
-    // Mettre à jour un module
-    public boolean updateModule(String matricule, Module updatedModule) {
-        for (int i = 0; i < modules.size(); i++) {
-            if (modules.get(i).getMatricule().equals(matricule)) {
-                modules.set(i, updatedModule);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Supprimer un module
-    public boolean deleteModule(String matricule) {
-        Iterator<Module> iterator = modules.iterator();
-        while (iterator.hasNext()) {
-            Module m = iterator.next();
-            if (m.getMatricule().equals(matricule)) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Récupérer tous les modules
-    public List<Module> getAllModules() {
-        return modules;
-    }
-
-    // Récupérer les modules d'une UE spécifique
-    public List<Module> getModulesByUE(UniteEnseignement ue) {
-        List<Module> result = new ArrayList<>();
-        for (Module m : modules) {
-            if (m.getUniteEnseignement() != null &&
-                    m.getUniteEnseignement().getCode() == ue.getCode()) {
-                result.add(m);
-            }
-        }
-        return result;
+    public synchronized boolean deleteModule(String matricule) {
+        return modules.removeIf(m -> m.getMatricule().equals(matricule));
     }
 }
